@@ -1,0 +1,286 @@
+--CREATE DATABASE Kora
+
+USE Kora
+
+-- BASE DE DATOS KORA - SISTEMA EDUCATIVO
+-- Estructura de tablas basada en el documento de materias y programas
+-- SINTAXIS PARA SQL SERVER
+
+-- Tabla de materias principales
+CREATE TABLE materias (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL UNIQUE,
+    descripcion NTEXT,
+    activa BIT DEFAULT 1,
+    fecha_creacion DATETIME2 DEFAULT GETDATE(),
+    fecha_actualizacion DATETIME2 DEFAULT GETDATE()
+);
+
+-- Tabla de ejes (Lectura, Escritura, etc.)
+CREATE TABLE ejes (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    codigo NVARCHAR(10) NOT NULL UNIQUE, -- L, E, etc.
+    nombre NVARCHAR(50) NOT NULL,
+    descripcion NTEXT
+);
+
+-- Tabla de programas
+CREATE TABLE programas (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    materia_id INT NOT NULL,
+    eje_id INT,
+    nombre NVARCHAR(100) NOT NULL,
+    nombre_comercial NVARCHAR(100),
+    grado_inicio NVARCHAR(10), -- K, 1, 2, etc.
+    grado_fin NVARCHAR(10),
+    descripcion_breve NTEXT,
+    prerrequisitos NTEXT,
+    activo BIT DEFAULT 1,
+    orden_secuencial INT,
+    fecha_creacion DATETIME2 DEFAULT GETDATE(),
+    fecha_actualizacion DATETIME2 DEFAULT GETDATE(),
+    
+    CONSTRAINT FK_programas_materia FOREIGN KEY (materia_id) REFERENCES materias(id) ON DELETE CASCADE,
+    CONSTRAINT FK_programas_eje FOREIGN KEY (eje_id) REFERENCES ejes(id) ON DELETE SET NULL
+);
+
+-- Crear índices para programas
+CREATE INDEX IX_programas_materia_grado ON programas(materia_id, grado_inicio, grado_fin);
+CREATE INDEX IX_programas_orden ON programas(orden_secuencial);
+
+-- Tabla de etapas dentro de cada programa
+CREATE TABLE etapas (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    programa_id INT NOT NULL,
+    numero_etapa INT NOT NULL,
+    nombre NVARCHAR(100) NOT NULL,
+    prerrequisitos NTEXT,
+    contenido NTEXT,
+    objetivos NTEXT,
+    evaluacion NTEXT,
+    orden_secuencial INT,
+    activa BIT DEFAULT 1,
+    fecha_creacion DATETIME2 DEFAULT GETDATE(),
+    fecha_actualizacion DATETIME2 DEFAULT GETDATE(),
+    
+    CONSTRAINT FK_etapas_programa FOREIGN KEY (programa_id) REFERENCES programas(id) ON DELETE CASCADE,
+    CONSTRAINT UQ_etapas_programa_numero UNIQUE (programa_id, numero_etapa)
+);
+
+-- Crear índices para etapas
+CREATE INDEX IX_etapas_programa_orden ON etapas(programa_id, orden_secuencial);
+
+-- Tabla de tipos de actividades
+CREATE TABLE tipos_actividades (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL UNIQUE,
+    descripcion NTEXT
+);
+
+-- Tabla de actividades por etapa
+CREATE TABLE actividades (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    etapa_id INT NOT NULL,
+    tipo_actividad_id INT NOT NULL,
+    nombre NVARCHAR(100) NOT NULL,
+    descripcion NTEXT,
+    instrucciones NTEXT,
+    tiempo_estimado INT, -- en minutos
+    orden_secuencial INT,
+    activa BIT DEFAULT 1,
+    fecha_creacion DATETIME2 DEFAULT GETDATE(),
+    fecha_actualizacion DATETIME2 DEFAULT GETDATE(),
+    
+    CONSTRAINT FK_actividades_etapa FOREIGN KEY (etapa_id) REFERENCES etapas(id) ON DELETE CASCADE,
+    CONSTRAINT FK_actividades_tipo FOREIGN KEY (tipo_actividad_id) REFERENCES tipos_actividades(id)
+);
+
+-- Crear índices para actividades
+CREATE INDEX IX_actividades_etapa_tipo ON actividades(etapa_id, tipo_actividad_id);
+CREATE INDEX IX_actividades_orden ON actividades(orden_secuencial);
+
+-- Tabla de ejercicios específicos
+CREATE TABLE ejercicios (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    actividad_id INT NOT NULL,
+    nombre NVARCHAR(100) NOT NULL,
+    enunciado NTEXT,
+    tipo_respuesta NVARCHAR(50) DEFAULT 'opcion_multiple', -- opcion_multiple, texto_libre, verdadero_falso, ordenamiento, clasificacion
+    contenido_ejercicio NVARCHAR(MAX), -- Para almacenar JSON con opciones, respuestas correctas, etc.
+    puntuacion_maxima INT DEFAULT 100,
+    tiempo_limite INT, -- en segundos
+    orden_secuencial INT,
+    activo BIT DEFAULT 1,
+    fecha_creacion DATETIME2 DEFAULT GETDATE(),
+    fecha_actualizacion DATETIME2 DEFAULT GETDATE(),
+    
+    CONSTRAINT FK_ejercicios_actividad FOREIGN KEY (actividad_id) REFERENCES actividades(id) ON DELETE CASCADE,
+    CONSTRAINT CK_ejercicios_tipo_respuesta CHECK (tipo_respuesta IN ('opcion_multiple', 'texto_libre', 'verdadero_falso', 'ordenamiento', 'clasificacion'))
+);
+
+-- Crear índices para ejercicios
+CREATE INDEX IX_ejercicios_actividad_orden ON ejercicios(actividad_id, orden_secuencial);
+CREATE INDEX IX_ejercicios_tipo_respuesta ON ejercicios(tipo_respuesta);
+
+-- Tabla para gestionar prerrequisitos entre programas
+CREATE TABLE prerrequisitos_programas (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    programa_id INT NOT NULL,
+    prerrequisito_programa_id INT NOT NULL,
+    obligatorio BIT DEFAULT 1,
+    
+    CONSTRAINT FK_prereq_prog_programa FOREIGN KEY (programa_id) REFERENCES programas(id) ON DELETE CASCADE,
+    CONSTRAINT FK_prereq_prog_prerequisito FOREIGN KEY (prerrequisito_programa_id) REFERENCES programas(id),
+    CONSTRAINT UQ_prerrequisitos_programas UNIQUE (programa_id, prerrequisito_programa_id),
+    CONSTRAINT CK_prereq_prog_no_circular CHECK (programa_id != prerrequisito_programa_id)
+);
+
+-- Tabla para gestionar prerrequisitos entre etapas
+CREATE TABLE prerrequisitos_etapas (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    etapa_id INT NOT NULL,
+    prerrequisito_etapa_id INT NOT NULL,
+    obligatorio BIT DEFAULT 1,
+    
+    CONSTRAINT FK_prereq_etapa_etapa FOREIGN KEY (etapa_id) REFERENCES etapas(id) ON DELETE CASCADE,
+    CONSTRAINT FK_prereq_etapa_prerequisito FOREIGN KEY (prerrequisito_etapa_id) REFERENCES etapas(id),
+    CONSTRAINT UQ_prerrequisitos_etapas UNIQUE (etapa_id, prerrequisito_etapa_id),
+    CONSTRAINT CK_prereq_etapa_no_circular CHECK (etapa_id != prerrequisito_etapa_id)
+);
+
+-- TRIGGER para actualizar fecha_actualizacion automáticamente en programas
+GO
+CREATE TRIGGER tr_programas_update
+ON programas
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE programas 
+    SET fecha_actualizacion = GETDATE()
+    FROM programas p
+    INNER JOIN inserted i ON p.id = i.id;
+END;
+GO
+
+-- TRIGGER para actualizar fecha_actualizacion automáticamente en etapas
+CREATE TRIGGER tr_etapas_update
+ON etapas
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE etapas 
+    SET fecha_actualizacion = GETDATE()
+    FROM etapas e
+    INNER JOIN inserted i ON e.id = i.id;
+END;
+GO
+
+-- TRIGGER para actualizar fecha_actualizacion automáticamente en actividades
+CREATE TRIGGER tr_actividades_update
+ON actividades
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE actividades 
+    SET fecha_actualizacion = GETDATE()
+    FROM actividades a
+    INNER JOIN inserted i ON a.id = i.id;
+END;
+GO
+
+-- TRIGGER para actualizar fecha_actualizacion automáticamente en ejercicios
+CREATE TRIGGER tr_ejercicios_update
+ON ejercicios
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE ejercicios 
+    SET fecha_actualizacion = GETDATE()
+    FROM ejercicios e
+    INNER JOIN inserted i ON e.id = i.id;
+END;
+GO
+
+-- DATOS INICIALES
+-- Insertar las materias principales
+INSERT INTO materias (nombre, descripcion) VALUES 
+(N'Literacidad', N'Desarrollo de habilidades de lectura y escritura'),
+(N'Matemáticas', N'Desarrollo de habilidades matemáticas'),
+(N'Investigación', N'Desarrollo de habilidades de investigación y análisis');
+
+-- Insertar los ejes
+INSERT INTO ejes (codigo, nombre, descripcion) VALUES 
+(N'L', N'Lectura', N'Eje enfocado en habilidades de lectura y comprensión'),
+(N'E', N'Escritura', N'Eje enfocado en habilidades de escritura y expresión'),
+(N'M', N'Matemáticas', N'Eje enfocado en habilidades matemáticas'),
+(N'I', N'Investigación', N'Eje enfocado en habilidades de investigación');
+
+-- Insertar tipos de actividades comunes
+INSERT INTO tipos_actividades (nombre, descripcion) VALUES 
+(N'Clasificación', N'Actividades donde el estudiante debe clasificar elementos'),
+(N'Identificación', N'Actividades donde el estudiante debe identificar elementos específicos'),
+(N'Comprensión', N'Actividades enfocadas en la comprensión lectora'),
+(N'Escritura Creativa', N'Actividades de producción escrita'),
+(N'Ejercicios Prácticos', N'Ejercicios de aplicación práctica');
+
+-- Ejemplo de programas para Literacidad (basado en el documento)
+INSERT INTO programas (materia_id, eje_id, nombre, nombre_comercial, grado_inicio, grado_fin, descripcion_breve, orden_secuencial) VALUES 
+(1, 1, N'Conciencia fonológica', NULL, N'K', N'1', N'Desarrollo de la conciencia fonológica', 1),
+(1, 1, N'Decodificación', N'Camino silábico', N'1', N'2', N'Desarrollo de habilidades de decodificación', 2),
+(1, 1, N'Lectura intermedia', NULL, N'3', N'4', N'Desarrollo de lectura intermedia', 3),
+(1, 1, N'Lectura avanzada', NULL, N'5', N'6', N'Desarrollo de lectura avanzada', 4),
+(1, 2, N'Grafemas', NULL, N'1', N'2', N'Aprendizaje de grafemas', 1),
+(1, 2, N'Escritura intermedia', NULL, N'3', N'4', N'Desarrollo de escritura intermedia', 2),
+(1, 2, N'Escritura avanzada', NULL, N'5', N'6', N'Desarrollo de escritura avanzada', 3),
+(1, 2, N'Gramática', NULL, N'1', N'6', N'Aprendizaje de gramática', 4),
+(1, 2, N'Ortografía', NULL, N'3', N'6', N'Desarrollo de habilidades ortográficas', 5),
+(1, 1, N'Comprensión lectora', NULL, N'1', N'6', N'Desarrollo de comprensión lectora', 5);
+
+-- Establecer prerrequisito (Conciencia fonológica es prerrequisito de Decodificación)
+INSERT INTO prerrequisitos_programas (programa_id, prerrequisito_programa_id) VALUES 
+(2, 1); -- Decodificación requiere Conciencia fonológica
+
+-- Ejemplo de etapa para el programa de Decodificación
+INSERT INTO etapas (programa_id, numero_etapa, nombre, prerrequisitos, contenido, objetivos, orden_secuencial) VALUES 
+(2, 1, N'Vocales', N'Discriminar sonidos. Habilidades relacionadas a la conciencia fonológica.', N'A E I O U', N'Identificar el sonido al inicio, medio y fin de una palabra. Reconocer la forma escrita.', 1);
+
+-- VISTAS ÚTILES
+-- Vista para obtener información completa de programas
+GO
+CREATE VIEW vista_programas_completa AS
+SELECT 
+    p.id,
+    p.nombre as programa_nombre,
+    p.nombre_comercial,
+    m.nombre as materia_nombre,
+    e.nombre as eje_nombre,
+    e.codigo as eje_codigo,
+    CONCAT(p.grado_inicio, N'-', p.grado_fin) as rango_grados,
+    p.descripcion_breve,
+    p.prerrequisitos,
+    p.orden_secuencial,
+    p.activo
+FROM programas p
+INNER JOIN materias m ON p.materia_id = m.id
+LEFT JOIN ejes e ON p.eje_id = e.id
+WHERE p.activo = 1 AND m.activa = 1;
+GO
+
+-- Vista para obtener la secuencia completa: materia -> programa -> etapa
+CREATE VIEW vista_secuencia_completa AS
+SELECT 
+    m.nombre as materia,
+    p.nombre as programa,
+    et.numero_etapa,
+    et.nombre as etapa,
+    CONCAT(p.grado_inicio, N'-', p.grado_fin) as grados,
+    et.contenido,
+    et.objetivos
+FROM materias m
+INNER JOIN programas p ON m.id = p.materia_id
+INNER JOIN etapas et ON p.id = et.programa_id
+WHERE m.activa = 1 AND p.activo = 1 AND et.activa = 1;
