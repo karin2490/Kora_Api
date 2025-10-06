@@ -20,21 +20,25 @@ cd Kora_Api
 ## En Windows (Command prompt):
 
 python -m venv env
+
 env/Scripts/activate
 
 ## En Windows (Powershell):
 
 python -m venv env
+
 ./env/Scripts/activate
 
 ## En Windows (Git Bash):
 
 python -m venv env
+
 source env/Scripts/activate
 
 ## En macOS/Linux:
 
 python -m venv env
+
 source env/bin/activate
 
 ### 3. Instalar dependencias
