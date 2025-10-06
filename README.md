@@ -20,7 +20,7 @@ cd Kora_Api
 ## En Windows (Command prompt):
 
 python -m venv env
-env\Scripts\activate
+env/Scripts/activate
 
 ## En Windows (Powershell):
 
