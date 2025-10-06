@@ -36,8 +36,8 @@ def get_materias(
     query = db.query(Materias)
     if solo_activas:
         query = query.filter(Materias.activa == True)
-    return query.offset(skip).limit(limit).all()
-    
+    return query.order_by(Materias.id).offset(skip).limit(limit).all()
+
 @router.get("/{materia_id}")
 def get_materia(materia_id: int, db: Session = Depends(get_db)):
     materia = db.query(Materias).filter(Materias.id == materia_id).first()
