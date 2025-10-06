@@ -25,7 +25,7 @@ env/Scripts/activate
 ## En Windows (Powershell):
 
 python -m venv env
-.\env\Scripts\activate
+./env/Scripts/activate
 
 ## En Windows (Git Bash):
 
