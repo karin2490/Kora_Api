@@ -17,8 +17,8 @@ DB_USERNAME = os.getenv("DB_USERNAME")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_DRIVER = os.getenv("DB_DRIVER")
 
-# Verificar que las variables se cargaron
-if not all([DB_SERVER, DB_DATABASE, DB_USERNAME, DB_PASSWORD, DB_DRIVER]):
+# Verificar que las variables mínimas se cargaron
+if not all([DB_SERVER, DB_DATABASE, DB_DRIVER]):
     print("❌ Error: No se pudieron cargar todas las variables de entorno")
     print(f"DB_SERVER: {DB_SERVER}")
     print(f"DB_DATABASE: {DB_DATABASE}")
@@ -28,7 +28,11 @@ if not all([DB_SERVER, DB_DATABASE, DB_USERNAME, DB_PASSWORD, DB_DRIVER]):
     raise ValueError("Faltan variables de entorno. Verifica tu archivo .env")
 
 # String de conexión para SQL Server
-DATABASE_URL = f"mssql+pyodbc://{DB_USERNAME}:{DB_PASSWORD}@{DB_SERVER}/{DB_DATABASE}?driver={DB_DRIVER.replace(' ', '+')}"
+# Si no hay usuario/password, usar Windows Authentication (Trusted_Connection)
+if not DB_USERNAME or not DB_PASSWORD:
+    DATABASE_URL = f"mssql+pyodbc://{DB_SERVER}/{DB_DATABASE}?driver={DB_DRIVER.replace(' ', '+')}&Trusted_Connection=yes"
+else:
+    DATABASE_URL = f"mssql+pyodbc://{DB_USERNAME}:{DB_PASSWORD}@{DB_SERVER}/{DB_DATABASE}?driver={DB_DRIVER.replace(' ', '+')}"
 
 print(f"Conectando a: {DATABASE_URL}")  # Para debug
 

@@ -1,4 +1,4 @@
---CREATE DATABASE Kora
+CREATE DATABASE Kora
 
 USE Kora
 

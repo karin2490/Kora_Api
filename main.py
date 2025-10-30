@@ -6,6 +6,7 @@ from routes.etapa import router as etapas_router
 from routes.tipo_actividad import router as tipos_router
 from routes.actividad import router as actividades_router
 from routes.ejercicio import router as ejercicios_router
+from routes import auth
 
 app = FastAPI(
     title="Kora API",
@@ -23,6 +24,7 @@ app.include_router(etapas_router)
 app.include_router(tipos_router)
 app.include_router(actividades_router)
 app.include_router(ejercicios_router)
+app.include_router(auth.router)
 
 @app.get("/")
 def read_root():
