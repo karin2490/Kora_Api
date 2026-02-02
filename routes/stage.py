@@ -29,7 +29,7 @@ class EtapaUpdate(BaseModel):
     activa: bool | None = None
 
 router = APIRouter(
-    prefix="/etapas",
+    prefix="/stages",
     tags=["etapas"]
 )
 

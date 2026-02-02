@@ -27,7 +27,7 @@ class ActividadUpdate(BaseModel):
     activa: bool | None = None
 
 router = APIRouter(
-    prefix="/actividades",
+    prefix="/activities",
     tags=["actividades"]
 )
 

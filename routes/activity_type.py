@@ -12,7 +12,7 @@ class TipoActividadCreate(TipoActividadBase):
     pass
 
 router = APIRouter(
-    prefix="/tipos-actividades",
+    prefix="/activity-types",
     tags=["tipos de actividades"]
 )
 

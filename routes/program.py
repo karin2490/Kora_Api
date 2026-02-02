@@ -32,7 +32,7 @@ class ProgramaUpdate(BaseModel):
     orden_secuencial: int | None = None
 
 router = APIRouter(
-    prefix="/programas",
+    prefix="/programs",
     tags=["programas"]
 )
 
