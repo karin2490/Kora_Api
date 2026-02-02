@@ -21,7 +21,7 @@ class MateriaUpdate(BaseModel):
     activa: bool | None = None
 
 router = APIRouter(
-    prefix="/materias",
+    prefix="/subjects",
     tags=["materias"]
 )
 
