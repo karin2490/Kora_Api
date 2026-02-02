@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator
@@ -12,13 +11,22 @@ from models.roles import Roles
 import re
 import secrets
 import string
+import os
+import bcrypt
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 # Configuración de seguridad
-SECRET_KEY = "tu_clave_secreta_super_segura_cambiala_en_produccion"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Validar que SECRET_KEY esté configurado
+if not SECRET_KEY:
+    raise ValueError("JWT_SECRET_KEY no está configurado en las variables de entorno")
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 router = APIRouter(
@@ -87,11 +95,13 @@ class ResetPassword(BaseModel):
         return v
 
 # Funciones auxiliares
-def verificar_password(password_plano, password_hash):
-    return pwd_context.verify(password_plano, password_hash)
+def verificar_password(password_plano: str, password_hash: str) -> bool:
+    """Verificar contraseña usando bcrypt directamente"""
+    return bcrypt.checkpw(password_plano.encode('utf-8'), password_hash.encode('utf-8'))
 
-def hashear_password(password):
-    return pwd_context.hash(password)
+def hashear_password(password: str) -> str:
+    """Hashear contraseña usando bcrypt directamente"""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def crear_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()

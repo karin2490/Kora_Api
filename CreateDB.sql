@@ -44,7 +44,7 @@ CREATE TABLE programas (
     CONSTRAINT FK_programas_eje FOREIGN KEY (eje_id) REFERENCES ejes(id) ON DELETE SET NULL
 );
 
--- Crear índices para programas
+-- Crear ï¿½ndices para programas
 CREATE INDEX IX_programas_materia_grado ON programas(materia_id, grado_inicio, grado_fin);
 CREATE INDEX IX_programas_orden ON programas(orden_secuencial);
 
@@ -67,7 +67,7 @@ CREATE TABLE etapas (
     CONSTRAINT UQ_etapas_programa_numero UNIQUE (programa_id, numero_etapa)
 );
 
--- Crear índices para etapas
+-- Crear ï¿½ndices para etapas
 CREATE INDEX IX_etapas_programa_orden ON etapas(programa_id, orden_secuencial);
 
 -- Tabla de tipos de actividades
@@ -95,11 +95,11 @@ CREATE TABLE actividades (
     CONSTRAINT FK_actividades_tipo FOREIGN KEY (tipo_actividad_id) REFERENCES tipos_actividades(id)
 );
 
--- Crear índices para actividades
+-- Crear ï¿½ndices para actividades
 CREATE INDEX IX_actividades_etapa_tipo ON actividades(etapa_id, tipo_actividad_id);
 CREATE INDEX IX_actividades_orden ON actividades(orden_secuencial);
 
--- Tabla de ejercicios específicos
+-- Tabla de ejercicios especï¿½ficos
 CREATE TABLE ejercicios (
     id INT IDENTITY(1,1) PRIMARY KEY,
     actividad_id INT NOT NULL,
@@ -118,7 +118,7 @@ CREATE TABLE ejercicios (
     CONSTRAINT CK_ejercicios_tipo_respuesta CHECK (tipo_respuesta IN ('opcion_multiple', 'texto_libre', 'verdadero_falso', 'ordenamiento', 'clasificacion'))
 );
 
--- Crear índices para ejercicios
+-- Crear ï¿½ndices para ejercicios
 CREATE INDEX IX_ejercicios_actividad_orden ON ejercicios(actividad_id, orden_secuencial);
 CREATE INDEX IX_ejercicios_tipo_respuesta ON ejercicios(tipo_respuesta);
 
@@ -148,7 +148,7 @@ CREATE TABLE prerrequisitos_etapas (
     CONSTRAINT CK_prereq_etapa_no_circular CHECK (etapa_id != prerrequisito_etapa_id)
 );
 
--- TRIGGER para actualizar fecha_actualizacion automáticamente en programas
+-- TRIGGER para actualizar fecha_actualizacion automï¿½ticamente en programas
 GO
 CREATE TRIGGER tr_programas_update
 ON programas
@@ -163,7 +163,7 @@ BEGIN
 END;
 GO
 
--- TRIGGER para actualizar fecha_actualizacion automáticamente en etapas
+-- TRIGGER para actualizar fecha_actualizacion automï¿½ticamente en etapas
 CREATE TRIGGER tr_etapas_update
 ON etapas
 AFTER UPDATE
@@ -177,7 +177,7 @@ BEGIN
 END;
 GO
 
--- TRIGGER para actualizar fecha_actualizacion automáticamente en actividades
+-- TRIGGER para actualizar fecha_actualizacion automï¿½ticamente en actividades
 CREATE TRIGGER tr_actividades_update
 ON actividades
 AFTER UPDATE
@@ -191,7 +191,7 @@ BEGIN
 END;
 GO
 
--- TRIGGER para actualizar fecha_actualizacion automáticamente en ejercicios
+-- TRIGGER para actualizar fecha_actualizacion automï¿½ticamente en ejercicios
 CREATE TRIGGER tr_ejercicios_update
 ON ejercicios
 AFTER UPDATE
@@ -209,47 +209,146 @@ GO
 -- Insertar las materias principales
 INSERT INTO materias (nombre, descripcion) VALUES 
 (N'Literacidad', N'Desarrollo de habilidades de lectura y escritura'),
-(N'Matemáticas', N'Desarrollo de habilidades matemáticas'),
-(N'Investigación', N'Desarrollo de habilidades de investigación y análisis');
+(N'Matemï¿½ticas', N'Desarrollo de habilidades matemï¿½ticas'),
+(N'Investigaciï¿½n', N'Desarrollo de habilidades de investigaciï¿½n y anï¿½lisis');
 
 -- Insertar los ejes
 INSERT INTO ejes (codigo, nombre, descripcion) VALUES 
-(N'L', N'Lectura', N'Eje enfocado en habilidades de lectura y comprensión'),
-(N'E', N'Escritura', N'Eje enfocado en habilidades de escritura y expresión'),
-(N'M', N'Matemáticas', N'Eje enfocado en habilidades matemáticas'),
-(N'I', N'Investigación', N'Eje enfocado en habilidades de investigación');
+(N'L', N'Lectura', N'Eje enfocado en habilidades de lectura y comprensiï¿½n'),
+(N'E', N'Escritura', N'Eje enfocado en habilidades de escritura y expresiï¿½n'),
+(N'M', N'Matemï¿½ticas', N'Eje enfocado en habilidades matemï¿½ticas'),
+(N'I', N'Investigaciï¿½n', N'Eje enfocado en habilidades de investigaciï¿½n');
 
 -- Insertar tipos de actividades comunes
 INSERT INTO tipos_actividades (nombre, descripcion) VALUES 
-(N'Clasificación', N'Actividades donde el estudiante debe clasificar elementos'),
-(N'Identificación', N'Actividades donde el estudiante debe identificar elementos específicos'),
-(N'Comprensión', N'Actividades enfocadas en la comprensión lectora'),
-(N'Escritura Creativa', N'Actividades de producción escrita'),
-(N'Ejercicios Prácticos', N'Ejercicios de aplicación práctica');
+(N'Clasificaciï¿½n', N'Actividades donde el estudiante debe clasificar elementos'),
+(N'Identificaciï¿½n', N'Actividades donde el estudiante debe identificar elementos especï¿½ficos'),
+(N'Comprensiï¿½n', N'Actividades enfocadas en la comprensiï¿½n lectora'),
+(N'Escritura Creativa', N'Actividades de producciï¿½n escrita'),
+(N'Ejercicios Prï¿½cticos', N'Ejercicios de aplicaciï¿½n prï¿½ctica');
 
 -- Ejemplo de programas para Literacidad (basado en el documento)
 INSERT INTO programas (materia_id, eje_id, nombre, nombre_comercial, grado_inicio, grado_fin, descripcion_breve, orden_secuencial) VALUES 
-(1, 1, N'Conciencia fonológica', NULL, N'K', N'1', N'Desarrollo de la conciencia fonológica', 1),
-(1, 1, N'Decodificación', N'Camino silábico', N'1', N'2', N'Desarrollo de habilidades de decodificación', 2),
+(1, 1, N'Conciencia fonolï¿½gica', NULL, N'K', N'1', N'Desarrollo de la conciencia fonolï¿½gica', 1),
+(1, 1, N'Decodificaciï¿½n', N'Camino silï¿½bico', N'1', N'2', N'Desarrollo de habilidades de decodificaciï¿½n', 2),
 (1, 1, N'Lectura intermedia', NULL, N'3', N'4', N'Desarrollo de lectura intermedia', 3),
 (1, 1, N'Lectura avanzada', NULL, N'5', N'6', N'Desarrollo de lectura avanzada', 4),
 (1, 2, N'Grafemas', NULL, N'1', N'2', N'Aprendizaje de grafemas', 1),
 (1, 2, N'Escritura intermedia', NULL, N'3', N'4', N'Desarrollo de escritura intermedia', 2),
 (1, 2, N'Escritura avanzada', NULL, N'5', N'6', N'Desarrollo de escritura avanzada', 3),
-(1, 2, N'Gramática', NULL, N'1', N'6', N'Aprendizaje de gramática', 4),
-(1, 2, N'Ortografía', NULL, N'3', N'6', N'Desarrollo de habilidades ortográficas', 5),
-(1, 1, N'Comprensión lectora', NULL, N'1', N'6', N'Desarrollo de comprensión lectora', 5);
+(1, 2, N'Gramï¿½tica', NULL, N'1', N'6', N'Aprendizaje de gramï¿½tica', 4),
+(1, 2, N'Ortografï¿½a', NULL, N'3', N'6', N'Desarrollo de habilidades ortogrï¿½ficas', 5),
+(1, 1, N'Comprensiï¿½n lectora', NULL, N'1', N'6', N'Desarrollo de comprensiï¿½n lectora', 5);
 
--- Establecer prerrequisito (Conciencia fonológica es prerrequisito de Decodificación)
+-- Establecer prerrequisito (Conciencia fonolï¿½gica es prerrequisito de Decodificaciï¿½n)
 INSERT INTO prerrequisitos_programas (programa_id, prerrequisito_programa_id) VALUES 
-(2, 1); -- Decodificación requiere Conciencia fonológica
+(2, 1); -- Decodificaciï¿½n requiere Conciencia fonolï¿½gica
 
--- Ejemplo de etapa para el programa de Decodificación
-INSERT INTO etapas (programa_id, numero_etapa, nombre, prerrequisitos, contenido, objetivos, orden_secuencial) VALUES 
-(2, 1, N'Vocales', N'Discriminar sonidos. Habilidades relacionadas a la conciencia fonológica.', N'A E I O U', N'Identificar el sonido al inicio, medio y fin de una palabra. Reconocer la forma escrita.', 1);
+-- Ejemplo de etapa para el programa de Decodificaciï¿½n
+INSERT INTO etapas (programa_id, numero_etapa, nombre, prerrequisitos, contenido, objetivos, orden_secuencial) VALUES
+(2, 1, N'Vocales', N'Discriminar sonidos. Habilidades relacionadas a la conciencia fonolï¿½gica.', N'A E I O U', N'Identificar el sonido al inicio, medio y fin de una palabra. Reconocer la forma escrita.', 1);
 
--- VISTAS ÚTILES
--- Vista para obtener información completa de programas
+-- ============================================
+-- TABLAS DE AUTENTICACIï¿½N
+-- ============================================
+
+-- Tabla de roles
+CREATE TABLE roles (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(50) NOT NULL UNIQUE,
+    descripcion NTEXT,
+    activo BIT DEFAULT 1,
+    fecha_creacion DATETIME2 DEFAULT GETDATE()
+);
+
+-- Tabla de usuarios
+CREATE TABLE usuarios (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    username NVARCHAR(50) NOT NULL UNIQUE,
+    email NVARCHAR(100) NOT NULL UNIQUE,
+    password_hash NVARCHAR(255) NOT NULL,
+    nombre NVARCHAR(100),
+    apellido NVARCHAR(100),
+    rol_id INT NOT NULL,
+    activo BIT DEFAULT 1,
+    fecha_creacion DATETIME2 DEFAULT GETDATE(),
+    fecha_actualizacion DATETIME2 DEFAULT GETDATE(),
+
+    CONSTRAINT FK_usuarios_rol FOREIGN KEY (rol_id) REFERENCES roles(id)
+);
+
+-- Crear ï¿½ndices para usuarios
+CREATE INDEX IX_usuarios_rol ON usuarios(rol_id);
+CREATE INDEX IX_usuarios_email ON usuarios(email);
+
+-- TRIGGER para actualizar fecha_actualizacion automï¿½ticamente en usuarios
+GO
+CREATE TRIGGER tr_usuarios_update
+ON usuarios
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE usuarios
+    SET fecha_actualizacion = GETDATE()
+    FROM usuarios u
+    INNER JOIN inserted i ON u.id = i.id;
+END;
+GO
+
+-- ============================================
+-- TABLA DE ACTIVIDADES DE USUARIOS
+-- ============================================
+
+-- Tabla para rastrear el progreso de cada usuario en cada actividad
+CREATE TABLE actividades_usuarios (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    actividad_id INT NOT NULL,
+    estado NVARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, in_progress, completed, abandoned
+    fecha_inicio DATETIME2 NULL,
+    fecha_completado DATETIME2 NULL,
+    progreso_porcentaje DECIMAL(5,2) DEFAULT 0.00,
+    tiempo_dedicado INT NULL, -- en minutos
+    intentos INT DEFAULT 0,
+    fecha_creacion DATETIME2 DEFAULT GETDATE(),
+    fecha_actualizacion DATETIME2 DEFAULT GETDATE(),
+
+    CONSTRAINT FK_actividades_usuarios_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    CONSTRAINT FK_actividades_usuarios_actividad FOREIGN KEY (actividad_id) REFERENCES actividades(id) ON DELETE CASCADE,
+    CONSTRAINT CK_actividades_usuarios_estado CHECK (estado IN ('pending', 'in_progress', 'completed', 'abandoned')),
+    CONSTRAINT UQ_actividades_usuarios_usuario_actividad UNIQUE (usuario_id, actividad_id)
+);
+
+-- Crear ï¿½ndices para actividades_usuarios
+CREATE INDEX IX_actividades_usuarios_usuario ON actividades_usuarios(usuario_id);
+CREATE INDEX IX_actividades_usuarios_actividad ON actividades_usuarios(actividad_id);
+CREATE INDEX IX_actividades_usuarios_estado ON actividades_usuarios(estado);
+
+-- TRIGGER para actualizar fecha_actualizacion automï¿½ticamente en actividades_usuarios
+GO
+CREATE TRIGGER tr_actividades_usuarios_update
+ON actividades_usuarios
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE actividades_usuarios
+    SET fecha_actualizacion = GETDATE()
+    FROM actividades_usuarios au
+    INNER JOIN inserted i ON au.id = i.id;
+END;
+GO
+
+-- Insert initial roles
+INSERT INTO roles (nombre, descripcion, activo) VALUES
+(N'student', N'Student of the educational system', 1),
+(N'teacher', N'Teacher of the educational system', 1),
+(N'admin', N'System administrator', 1);
+
+-- ============================================
+-- VISTAS ï¿½TILES
+-- Vista para obtener informaciï¿½n completa de programas
 GO
 CREATE VIEW vista_programas_completa AS
 SELECT 
@@ -272,7 +371,7 @@ GO
 
 -- Vista para obtener la secuencia completa: materia -> programa -> etapa
 CREATE VIEW vista_secuencia_completa AS
-SELECT 
+SELECT
     m.nombre as materia,
     p.nombre as programa,
     et.numero_etapa,
@@ -284,3 +383,58 @@ FROM materias m
 INNER JOIN programas p ON m.id = p.materia_id
 INNER JOIN etapas et ON p.id = et.programa_id
 WHERE m.activa = 1 AND p.activo = 1 AND et.activa = 1;
+GO
+
+-- Vista para obtener el progreso de usuarios en actividades
+CREATE VIEW vista_progreso_usuarios AS
+SELECT
+    u.id as usuario_id,
+    u.username,
+    u.nombre as usuario_nombre,
+    u.apellido as usuario_apellido,
+    r.nombre as rol,
+    a.id as actividad_id,
+    a.nombre as actividad_nombre,
+    ta.nombre as tipo_actividad,
+    et.nombre as etapa_nombre,
+    p.nombre as programa_nombre,
+    m.nombre as materia_nombre,
+    au.estado,
+    au.progreso_porcentaje,
+    au.fecha_inicio,
+    au.fecha_completado,
+    au.tiempo_dedicado,
+    au.intentos
+FROM usuarios u
+INNER JOIN roles r ON u.rol_id = r.id
+LEFT JOIN actividades_usuarios au ON u.id = au.usuario_id
+LEFT JOIN actividades a ON au.actividad_id = a.id
+LEFT JOIN tipos_actividades ta ON a.tipo_actividad_id = ta.id
+LEFT JOIN etapas et ON a.etapa_id = et.id
+LEFT JOIN programas p ON et.programa_id = p.id
+LEFT JOIN materias m ON p.materia_id = m.id
+WHERE u.activo = 1;
+GO
+
+-- Vista para actividades pendientes por usuario
+CREATE VIEW vista_actividades_pendientes AS
+SELECT
+    u.id as usuario_id,
+    u.username,
+    u.nombre as usuario_nombre,
+    a.id as actividad_id,
+    a.nombre as actividad_nombre,
+    ta.nombre as tipo_actividad,
+    et.nombre as etapa_nombre,
+    p.nombre as programa_nombre,
+    au.estado,
+    au.progreso_porcentaje
+FROM usuarios u
+INNER JOIN actividades_usuarios au ON u.id = au.usuario_id
+INNER JOIN actividades a ON au.actividad_id = a.id
+INNER JOIN tipos_actividades ta ON a.tipo_actividad_id = ta.id
+INNER JOIN etapas et ON a.etapa_id = et.id
+INNER JOIN programas p ON et.programa_id = p.id
+WHERE u.activo = 1
+  AND au.estado IN ('pending', 'in_progress')
+  AND a.activa = 1;
