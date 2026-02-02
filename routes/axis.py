@@ -17,7 +17,7 @@ class EjeUpdate(BaseModel):
     descripcion: str | None = None
 
 router = APIRouter(
-    prefix="/ejes",
+    prefix="/axes",
     tags=["ejes"]
 )
 

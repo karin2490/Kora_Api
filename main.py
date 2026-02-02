@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.materia import router as materias_router
-from routes.eje import router as ejes_router
-from routes.programa import router as programas_router
-from routes.etapa import router as etapas_router
-from routes.tipo_actividad import router as tipos_router
-from routes.actividad import router as actividades_router
-from routes.ejercicio import router as ejercicios_router
-from routes.actividades_usuarios import router as actividades_usuarios_router
+from routes.subject import router as subjects_router
+from routes.axis import router as axes_router
+from routes.program import router as programs_router
+from routes.stage import router as stages_router
+from routes.activity_type import router as activity_types_router
+from routes.activity import router as activities_router
+from routes.exercise import router as exercises_router
+from routes.user_activities import router as user_activities_router
 from routes import auth
 
 app = FastAPI(
@@ -27,29 +27,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Incluir todos los routers
-app.include_router(materias_router)
-app.include_router(ejes_router)
-app.include_router(programas_router)
-app.include_router(etapas_router)
-app.include_router(tipos_router)
-app.include_router(actividades_router)
-app.include_router(ejercicios_router)
-app.include_router(actividades_usuarios_router)
+# Include all routers
+app.include_router(subjects_router)
+app.include_router(axes_router)
+app.include_router(programs_router)
+app.include_router(stages_router)
+app.include_router(activity_types_router)
+app.include_router(activities_router)
+app.include_router(exercises_router)
+app.include_router(user_activities_router)
 app.include_router(auth.router)
 
 @app.get("/")
 def read_root():
     return {
-        "message": "Bienvenido a Kora API",
+        "message": "Welcome to Kora API",
         "endpoints": {
-            "materias": "/materias",
-            "ejes": "/ejes",
-            "programas": "/programas",
-            "etapas": "/etapas",
-            "tipos_actividades": "/tipos-actividades",
-            "actividades": "/actividades",
-            "ejercicios": "/ejercicios",
+            "subjects": "/subjects",
+            "axes": "/axes",
+            "programs": "/programs",
+            "stages": "/stages",
+            "activity_types": "/activity-types",
+            "activities": "/activities",
+            "exercises": "/exercises",
+            "user_activities": "/users/me/activities",
             "docs": "/docs"
         }
     }

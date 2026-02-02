@@ -31,7 +31,7 @@ class EjercicioUpdate(BaseModel):
     activo: bool | None = None
 
 router = APIRouter(
-    prefix="/ejercicios",
+    prefix="/exercises",
     tags=["ejercicios"]
 )
 
